@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>استمارة قياس السلوك — جميع المراحل (v5 + تذييل + اسم المدرسة)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f8fafc;--ink:#0f172a;--muted:#64748b;--brand:#22c55e;--card:#fff;--border:#e5e7eb}
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:"Cairo",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    .container{max-width:980px;margin:0 auto;padding:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:0 10px 30px rgba(2,6,23,.06)}
+    .input{width:100%;border:1px solid var(--border);border-radius:12px;padding:.6rem .9rem;background:#fff;outline:none}
+    .input:focus{border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.15)}
+    .button{border:1px solid var(--border);background:#fff;border-radius:12px;padding:.6rem 1rem;font-weight:700}
+    .button:hover{border-color:#0ea5e9;box-shadow:0 6px 20px rgba(2,6,23,.08)}
+    table{border-collapse:separate;border-spacing:0}
+    th,td{border-bottom:1px solid var(--border);vertical-align:top}
+    th{font-weight:800}
+    .legend span{display:inline-block;margin-inline-end:12px;color:#475569}
+    .legend b{color:#0f172a}
+    .dom-cell{background:#f8fafc;border-inline-start:1px solid var(--border);padding:.75rem;border-radius:12px;margin:.25rem 0;font-weight:700;color:#0f172a;min-width:110px}
+    .scale-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.3rem}
+    @media(min-width:640px){.scale-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+    .tbl{width:100%;border:1px solid #94a3b8}
+    .tbl th,.tbl td{border:1px solid #94a3b8;padding:.6rem}
+    .tbl thead th{background:#f1f5f9}
+    .chk{width:18px;height:18px}
+    .credit{font-weight:800;color:#0f172a}
+    @media print{
+      .no-print{display:none!important}
+      body{background:#fff;-webkit-print-color-adjust:exact; print-color-adjust:exact}
+      .card{box-shadow:none}
+      .dom-cell{background:#fff}
+      #logo{display:block !important; visibility:visible !important; opacity:1 !important}
+      a[href]:after{content:""}
+      img{max-width:100%}
+    }
+  </style>
+  <style id="printStyles"></style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <header class="p-4 md:p-6 border-b flex items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-black tracking-tight">استمارة قياس السلوك</h1>
+          <p class="text-sm text-slate-500 mt-1">مناسبة للمرحلة: <span class="font-semibold">الابتدائية / المتوسطة / الثانوية</span></p>
+        </div>
+        <img id="logo" class="w-16 h-16 md:w-20 md:h-20 object-contain rounded-md border border-slate-200" alt="شعار" style="display:none;">
+      </header>
+
+      <!-- Added School Name field (no other changes) -->
+      <section class="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm mb-1 text-slate-600">اسم الطالب/ـة</label>
+          <input id="studentName" class="input" placeholder="مثال: سارة أحمد الدوسري">
+        </div>
+        <div>
+          <label class="block text-sm mb-1 text-slate-600">اسم المدرسة</label>
+          <input id="schoolName" class="input" placeholder="مثال: الابتدائية الثالثة والخمسون">
+        </div>
+        <div>
+          <label class="block text-sm mb-1 text-slate-600">المرحلة</label>
+          <select id="stage" class="input">
+            <option value="الابتدائية">الابتدائية</option>
+            <option value="المتوسطة" selected>المتوسطة</option>
+            <option value="الثانوية">الثانوية</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm mb-1 text-slate-600">الصف/الشعبة</label>
+          <input id="gradeInput" class="input" placeholder="مثال: ثالث/أ">
+        </div>
+        <div>
+          <label class="block text-sm mb-1 text-slate-600">التاريخ</label>
+          <input id="date" type="date" class="input">
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm mb-1 text-slate-600">ملاحظات</label>
+          <textarea id="notes" rows="2" class="input" placeholder="أي ملاحظات أو مواقف داعمة..."></textarea>
+        </div>
+      </section>
+
+      <section class="p-4 md:px-6 pt-0">
+        <div class="no-print flex flex-col md:flex-row items-start md:items-center gap-3">
+          <div class="flex items-center gap-2">
+            <label class="text-sm font-semibold text-slate-700">طريقة العرض</label>
+            <select id="modeSelect" class="input">
+              <option value="prepost" selected>قبلي/بعدي (٤ مستويات)</option>
+              <option value="simple">جدول مبسّط (٣ خانات)</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="orientation" class="text-sm font-semibold text-slate-700">اتجاه الطباعة</label>
+            <select id="orientation" class="input">
+              <option value="portrait" selected>طولي (A4)</option>
+              <option value="landscape">عرضي (A4)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Pre/Post Table ===== -->
+      <section id="tablePrePostWrap" class="px-4 md:px-6 pb-2">
+        <div class="legend text-xs mb-3">
+          <span>مقياس الاختيار: <b>١</b> نادراً، <b>٢</b> أحياناً، <b>٣</b> غالباً، <b>٤</b> دائمًا</span>
+        </div>
+        <div class="overflow-x-auto border rounded-xl bg-white">
+          <table class="w-full min-w-[920px] text-sm">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="p-3 text-center w-[17%]">قبلي</th>
+                <th class="p-3 text-center w-[18%]">بعدي</th>
+                <th class="p-3 text-right w-[43%]">العبارة</th>
+                <th class="p-3 text-right w-[22%]">المجال</th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-3">
+          <div class="px-4 py-3 bg-slate-50 rounded-xl border">
+            <div class="text-xs text-slate-500">الدرجة الكلية (قبلي)</div>
+            <div id="preTotal" class="text-2xl font-bold">٠</div>
+          </div>
+          <div class="px-4 py-3 bg-slate-50 rounded-xl border">
+            <div class="text-xs text-slate-500">الدرجة الكلية (بعدي)</div>
+            <div id="postTotal" class="text-2xl font-bold">٠</div>
+          </div>
+          <div class="px-4 py-3 bg-slate-50 rounded-xl border">
+            <div class="text-xs text-slate-500">التحسن</div>
+            <div id="delta" class="text-2xl font-bold">٠</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Simple Table ===== -->
+      <section id="tableSimpleWrap" class="px-4 md:px-6 pb-6 hidden">
+        <div class="legend text-xs mb-3">
+          <span>اختر خانة واحدة لكل عبارة: <b>دائمًا</b>، <b>غالبًا</b>، <b>أحيانًا/نادرًا</b></span>
+        </div>
+        <div class="overflow-x-auto rounded-xl bg-white border">
+          <table class="tbl text-sm">
+            <thead>
+              <tr>
+                <th class="text-center w-[12%]">أحيانًا / نادرًا</th>
+                <th class="text-center w-[10%]">غالبًا</th>
+                <th class="text-center w-[10%]">دائمًا</th>
+                <th class="text-right  w-[44%]">العبارات</th>
+                <th class="text-right  w-[24%]">المجال</th>
+              </tr>
+            </thead>
+            <tbody id="simpleBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="px-4 md:px-6 pb-4" id="domainSummaryWrap">
+        <h2 class="text-base font-extrabold mt-4 mb-2">ملخص المجالات</h2>
+        <div id="domainTotals" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+      </section>
+
+      <footer class="p-4 md:p-6 border-t flex flex-wrap items-center gap-3">
+        <label class="no-print flex items-center gap-2 text-sm font-semibold cursor-pointer">
+          <input id="logoInput" type="file" accept="image/*" class="hidden">
+          <span class="inline-flex items-center justify-center w-9 h-9 rounded-full border">🖼️</span>
+          أضف شعار المدرسة (اختياري)
+        </label>
+        <div class="grow"></div>
+
+        <!-- Credit -->
+        <div class="credit text-sm md:text-base">برمجة أ: فاطمة هزازي</div>
+
+        <!-- Controls -->
+        <button class="button no-print" id="printBtn">طباعة / PDF</button>
+        <button id="exportCSV" class="button no-print">تصدير النتائج (CSV)</button>
+        <button id="resetBtn" class="button no-print">إعادة تعيين</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // ===== Data =====
+    var items = [
+      {domain:'الانضباط', text:'ألتزم بالحضور المبكر إلى المدرسة'},
+      {domain:'الانضباط', text:'أحافظ على النظام داخل الصف'},
+      {domain:'النظافة', text:'أحافظ على نظافة ملابسي ومظهري'},
+      {domain:'النظافة', text:'أساهم في نظافة فصلي والمدرسة'},
+      {domain:'الاحترام', text:'أتحدث مع معلماتي وزميلاتي بأدب'},
+      {domain:'الاحترام', text:'أحترم أنظمة المدرسة وأطبقها'},
+      {domain:'المسؤولية', text:'أنجز واجباتي المدرسية بانتظام'},
+      {domain:'المسؤولية', text:'أشارك في الأنشطة الصفية واللاصفية'},
+      {domain:'السلوك الإيجابي', text:'أساعد زميلتي عند الحاجة'},
+      {domain:'السلوك الإيجابي', text:'أتحكم في انفعالاتي وأتجنب المشاجرات'}
+    ];
+
+    // ===== Helpers =====
+    function toArabicDigits(n){ return String(n).replace(/\\d/g, function(d){ return '٠١٢٣٤٥٦٧٨٩'[+d];}); }
+    function toAsciiDigits(s){
+      var map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+      return String(s).replace(/[٠-٩]/g, function(ch){ return map[ch] || ch; });
+    }
+    function applyOrientation(value){
+      var styleEl = document.getElementById('printStyles');
+      var size = value === 'landscape' ? 'A4 landscape' : 'A4 portrait';
+      styleEl.textContent = '@page { size: ' + size + '; margin: 12mm; }';
+    }
+    function groupByDomain(arr){
+      var map = {}; var i;
+      for(i=0;i<arr.length;i++){
+        var it = arr[i];
+        if(!map[it.domain]) map[it.domain] = [];
+        map[it.domain].push({it:it, idx:i});
+      }
+      return map;
+    }
+
+    // ===== Pre/Post table =====
+    function buildScale(prefix, idx) {
+      var name = prefix + '-' + idx;
+      var opts = [
+        {v:1, label:'نادراً'},
+        {v:2, label:'أحياناً'},
+        {v:3, label:'غالباً'},
+        {v:4, label:'دائمًا'}
+      ];
+      var html = '<div class="scale-grid">';
+      for(var i=0;i<opts.length;i++){
+        var opt = opts[i];
+        html += '<label class="inline-flex items-center gap-2 p-1 rounded hover:bg-slate-50">'
+              + '<input type="radio" name="'+name+'" value="'+opt.v+'" class="scaleInput accent-emerald-600">'
+              + '<span class="text-xs text-slate-600">'+opt.label+' <span class="text-slate-400">('+opt.v+')</span></span>'
+              + '</label>';
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function buildRowsPrePost() {
+      var tbody = document.getElementById('itemsBody');
+      tbody.innerHTML = '';
+      var byDomain = groupByDomain(items);
+      var doms = Object.keys(byDomain);
+
+      for(var d=0; d<doms.length; d++){
+        var dom = doms[d];
+        var group = byDomain[dom];
+        for(var i=0; i<group.length; i++){
+          var pair = group[i];
+          var it = pair.it, idx = pair.idx;
+
+          var tr = document.createElement('tr');
+
+          var tdPre = document.createElement('td');  tdPre.className  = 'p-3 align-top';  tdPre.innerHTML  = buildScale('pre', idx);
+          var tdPost= document.createElement('td');  tdPost.className = 'p-3 align-top';  tdPost.innerHTML = buildScale('post', idx);
+          var tdTxt = document.createElement('td');  tdTxt.className  = 'p-3 align-top';  tdTxt.textContent = it.text;
+
+          tr.appendChild(tdPre); tr.appendChild(tdPost); tr.appendChild(tdTxt);
+
+          if(i === 0){
+            var tdDom = document.createElement('td'); tdDom.className = 'p-3 align-top';
+            var chip = document.createElement('div'); chip.className = 'dom-cell'; chip.textContent = dom;
+            tdDom.appendChild(chip); tdDom.rowSpan = group.length; tr.appendChild(tdDom);
+          }
+          tbody.appendChild(tr);
+        }
+      }
+      var radios = document.querySelectorAll('.scaleInput');
+      Array.prototype.forEach.call(radios, function(el){ el.addEventListener('change', recalc); });
+    }
+
+    function recalc() {
+      var preTotal = 0, postTotal = 0;
+      var domainPre = {}, domainPost = {};
+      for(var idx=0; idx<items.length; idx++){
+        var it = items[idx];
+        var rPre  = document.querySelector('input[name="pre-'+idx+'"]:checked');
+        var rPost = document.querySelector('input[name="post-'+idx+'"]:checked');
+        var pv = rPre  ? parseInt(rPre.value, 10)  : 0;
+        var qv = rPost ? parseInt(rPost.value, 10) : 0;
+        preTotal += pv; postTotal += qv;
+        domainPre[it.domain]  = (domainPre[it.domain]  || 0) + pv;
+        domainPost[it.domain] = (domainPost[it.domain] || 0) + qv;
+      }
+      document.getElementById('preTotal').textContent  = toArabicDigits(preTotal);
+      document.getElementById('postTotal').textContent = toArabicDigits(postTotal);
+      document.getElementById('delta').textContent     = toArabicDigits(postTotal - preTotal);
+      renderDomainTotals(domainPre, domainPost);
+    }
+
+    function renderDomainTotals(preMap, postMap) {
+      var wrap = document.getElementById('domainTotals');
+      wrap.innerHTML = '';
+      var domains = [];
+      for(var i=0;i<items.length;i++){ if(domains.indexOf(items[i].domain)===-1) domains.push(items[i].domain); }
+      for(var d=0; d<domains.length; d++){
+        var name = domains[d];
+        var pre = preMap[name] || 0;
+        var post = postMap[name] || 0;
+        var count = 0;
+        for(var j=0;j<items.length;j++){ if(items[j].domain===name) count++; }
+        var max = count * 4;
+        var pctPre  = max ? Math.round((pre/max)*100)  : 0;
+        var pctPost = max ? Math.round((post/max)*100) : 0;
+
+        var card = document.createElement('div');
+        card.className = 'rounded-xl border p-3 bg-white';
+        card.innerHTML = ''
+          + '<div class="text-sm font-semibold mb-1">'+name+'</div>'
+          + '<div class="text-xs text-slate-500">قبلي: '+toArabicDigits(pre)+' / '+toArabicDigits(max)+' — '+toArabicDigits(pctPre)+'٪</div>'
+          + '<div class="relative w-full h-2 bg-slate-200 rounded mt-1"><div style="width:'+pctPre+'%;" class="absolute inset-y-0 left-0 bg-slate-400 rounded"></div></div>'
+          + '<div class="text-xs text-slate-500 mt-2">بعدي: '+toArabicDigits(post)+' / '+toArabicDigits(max)+' — '+toArabicDigits(pctPost)+'٪</div>'
+          + '<div class="relative w-full h-2 bg-slate-200 rounded mt-1"><div style="width:'+pctPost+'%;" class="absolute inset-y-0 left-0 bg-emerald-500 rounded"></div></div>';
+        wrap.appendChild(card);
+      }
+    }
+
+    // ===== Simple table =====
+    function buildRowsSimple(){
+      var tbody = document.getElementById('simpleBody');
+      tbody.innerHTML = '';
+      var byDomain = groupByDomain(items);
+      var doms = Object.keys(byDomain);
+
+      for(var d=0; d<doms.length; d++){
+        var dom = doms[d];
+        var group = byDomain[dom];
+        for(var i=0; i<group.length; i++){
+          var pair = byDomain[dom][i];
+          var idx = pair.idx, it = pair.it;
+
+          var tr = document.createElement('tr');
+          var tdRare   = document.createElement('td'); tdRare.className   = 'text-center align-top';
+          var tdOften  = document.createElement('td'); tdOften.className  = 'text-center align-top';
+          var tdAlways = document.createElement('td'); tdAlways.className = 'text-center align-top';
+          tdRare.innerHTML   = '<input class="chk simpInput" type="checkbox" data-col="rare"  name="simp-'+idx+'">';
+          tdOften.innerHTML  = '<input class="chk simpInput" type="checkbox" data-col="often" name="simp-'+idx+'">';
+          tdAlways.innerHTML = '<input class="chk simpInput" type="checkbox" data-col="always" name="simp-'+idx+'">';
+          var tdTxt = document.createElement('td'); tdTxt.className='align-top'; tdTxt.textContent = it.text;
+          tr.appendChild(tdRare); tr.appendChild(tdOften); tr.appendChild(tdAlways); tr.appendChild(tdTxt);
+
+          if(i === 0){
+            var tdDom = document.createElement('td'); tdDom.className = 'align-top';
+            tdDom.textContent = dom; tdDom.rowSpan = group.length; tr.appendChild(tdDom);
+          }
+          tbody.appendChild(tr);
+        }
+      }
+      var cbs = document.querySelectorAll('.simpInput');
+      Array.prototype.forEach.call(cbs, function(cb){
+        cb.addEventListener('change', function(e){
+          if(!e.target.checked) return;
+          var name = e.target.getAttribute('name');
+          var peers = document.querySelectorAll('input[name="'+name+'"]');
+          Array.prototype.forEach.call(peers, function(x){ if(x!==e.target) x.checked = false; });
+        });
+      });
+    }
+
+    // ===== Events & init =====
+    function initListeners(){
+      document.getElementById('resetBtn').addEventListener('click', function(){
+        Array.prototype.forEach.call(document.querySelectorAll('input[type="radio"],input[type="checkbox"]'), function(el){ el.checked = false; });
+        recalc();
+      });
+      document.getElementById('exportCSV').addEventListener('click', exportCSV);
+      document.getElementById('logoInput').addEventListener('change', handleLogo);
+      document.getElementById('orientation').addEventListener('change', function(e){ applyOrientation(e.target.value); });
+      document.getElementById('printBtn').addEventListener('click', function(){
+        applyOrientation(document.getElementById('orientation').value);
+        var lg = document.getElementById('logo'); if(lg && lg.src) { lg.style.display='block'; }
+        setTimeout(function(){ window.print(); }, 50);
+      });
+      window.addEventListener('beforeprint', function(){
+        applyOrientation(document.getElementById('orientation').value);
+        var lg = document.getElementById('logo'); if(lg && lg.src) { lg.style.display='block'; }
+      });
+      document.getElementById('modeSelect').addEventListener('change', function(e){ switchMode(e.target.value); });
+    }
+
+    function exportCSV(){
+      var school = document.getElementById('schoolName').value || '';
+      var name  = document.getElementById('studentName').value || '';
+      var stage = document.getElementById('stage').value || '';
+      var grade = document.getElementById('gradeInput').value || '';
+      var date  = document.getElementById('date').value || '';
+
+      var headers = ['اسم المدرسة','اسم','المرحلة','الصف/الشعبة','التاريخ'];
+      var row     = [school, name, stage, grade, date];
+
+      var mode = document.getElementById('modeSelect').value;
+      if(mode === 'prepost'){
+        var preTotal  = toAsciiDigits(document.getElementById('preTotal').textContent).replace(/[^\\d-]/g,'')  || '0';
+        var postTotal = toAsciiDigits(document.getElementById('postTotal').textContent).replace(/[^\\d-]/g,'') || '0';
+        var delta     = toAsciiDigits(document.getElementById('delta').textContent).replace(/[^\\d-]/g,'')     || '0';
+        headers.push('قبلي','بعدي','التحسن'); row.push(preTotal, postTotal, delta);
+        for(var idx=0; idx<items.length; idx++){
+          var it = items[idx];
+          var pre  = document.querySelector('input[name="pre-'+idx+'"]:checked');
+          var post = document.querySelector('input[name="post-'+idx+'"]:checked');
+          headers.push('قبلي: '+it.text, 'بعدي: '+it.text);
+          row.push(pre ? pre.value : '', post ? post.value : '');
+        }
+      } else {
+        headers.push('التقييم (نموذج مبسّط)'); row.push('—');
+        for(var idx=0; idx<items.length; idx++){
+          var it2 = items[idx];
+          var selected = document.querySelector('input[name="simp-'+idx+'"]:checked');
+          headers.push(it2.text);
+          var v = '';
+          if(selected){
+            var col = selected.getAttribute('data-col');
+            v = col === 'always' ? 'دائمًا' : (col === 'often' ? 'غالبًا' : 'أحيانًا/نادرًا');
+          }
+          row.push(v);
+        }
+      }
+
+      var csv = '\\uFEFF' + headers.join(',') + '\\n' + row.map(function(v){ return '"' + String(v).replace(/"/g,'""') + '"'; }).join(',');
+      var blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a'); a.href = url; a.download = 'نتائج_استمارة_قياس_السلوك.csv';
+      document.body.appendChild(a); a.click(); URL.revokeObjectURL(url); a.remove();
+    }
+
+    function handleLogo(e){
+      var file = e.target.files && e.target.files[0]; if(!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev){
+        var img = document.getElementById('logo');
+        img.onload = function(){ img.style.display='block'; };
+        img.src = ev.target.result; img.alt = 'شعار المدرسة';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function switchMode(mode){
+      var pre = document.getElementById('tablePrePostWrap');
+      var simp = document.getElementById('tableSimpleWrap');
+      var summary = document.getElementById('domainSummaryWrap');
+      if(mode === 'prepost'){ pre.classList.remove('hidden'); simp.classList.add('hidden'); summary.classList.remove('hidden'); }
+      else { pre.classList.add('hidden'); simp.classList.remove('hidden'); summary.classList.add('hidden'); }
+    }
+
+    function start(){
+      buildRowsPrePost();
+      buildRowsSimple();
+      initListeners();
+      recalc();
+      applyOrientation('portrait');
+    }
+
+    if(document.readyState === 'complete' || document.readyState === 'interactive'){ setTimeout(start, 0); }
+    else { window.addEventListener('DOMContentLoaded', start); }
+  </script>
+</body>
+</html>
